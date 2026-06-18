@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>products</title>
+</head>
+<body>
+    <h1>Products</h1>
+    {% for product in products %}
+        <div>
+            <img src="{{ product.product_image.url }}" width="400" height="500" alt="{{product.product_title}}">
+            <h2>
+                <a href="{% url 'product_detail' product.id %}">
+                    {{ product.product_title }}
+                </a>
+            </h2>
+            <p>{{product.product_price}}</p>
+        </div>
+        <hr>
+    {% endfor %}
+</body>
+</html>
