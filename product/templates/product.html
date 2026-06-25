@@ -13,6 +13,9 @@
         {{ product.product_title }}
     </h2>
     <p>{{product.product_price}}</p>
+    <a href="{% url 'create_order' product.id %}">
+        Buy Now
+    </a>
 </body>
 
 </html>

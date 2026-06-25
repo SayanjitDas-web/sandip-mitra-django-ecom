@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>order detail</title>
+</head>
+
+<body>
+    <h1>Order #{{ order.id }}</h1>
+
+    <p>Status: {{ order.status }}</p>
+
+    <p>Address: {{ order.shipping_address }}</p>
+
+    <p>Phone: {{ order.phone_number }}</p>
+
+    <hr>
+
+    {% for item in order.items.all %}
+    <h3>{{ item.product.product_title }}</h3>
+
+    <p>Price: ₹{{ item.price }}</p>
+
+    <p>Quantity: {{ item.quantity }}</p>
+
+    <p>Subtotal: ₹{{ item.subtotal }}</p>
+
+    <hr>
+    {% endfor %}
+
+    <h2>Total: ₹{{ order.total_price }}</h2>
+
+    {% if order.status == "pending" %}
+    <a href="{% url 'cancel_order' order.id %}">
+        Cancel Order
+    </a>
+    {% endif %}
+</body>
+
+</html>
