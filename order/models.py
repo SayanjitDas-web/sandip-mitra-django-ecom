@@ -10,7 +10,7 @@ class Order(models.Model):
         ("shipped","Shipped"),
         ("delivered","Delivered"),
         ("cancelled","Cancelled"),
-    ],
+    ]
     user = models.ForeignKey(
         User,
         related_name="orders",
@@ -20,9 +20,9 @@ class Order(models.Model):
         max_length=20,
         choices=STATUS_CHOICES,
         default="pending"
-    ),
+    )
     
-    shipping_address = models.TextField(),
+    shipping_address = models.TextField()
     phone_number = models.CharField(max_length=15)
     
     created_at = models.DateTimeField(auto_now_add=True)
