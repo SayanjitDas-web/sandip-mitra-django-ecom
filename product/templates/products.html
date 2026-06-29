@@ -3,21 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>products</title>
+    <title>Products</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --parchment: #FAF7F2;
+            --parchment-mid: #F0EBE3;
+            --border: #E0D8CE;
+            --ink: #1C1C1C;
+            --ink-muted: #6B6560;
+            --terracotta: #C1440E;
+            --terracotta-light: #E8956D;
+            --white: #FFFFFF;
+        }
+
+        body {
+            background-color: var(--parchment);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .site-header {
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 4rem;
+            display: flex;
+            align-items: baseline;
+            gap: 1.5rem;
+        }
+
+        .site-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: var(--ink);
+        }
+
+        .header-rule {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .product-count {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        /* ── Grid ── */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            padding: 3rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); padding: 2rem; }
+            .site-header { padding: 1.5rem 2rem; }
+        }
+
+        @media (max-width: 560px) {
+            .products-grid { grid-template-columns: 1fr; padding: 1.5rem; }
+            .site-header { padding: 1.25rem 1.5rem; }
+        }
+
+        /* ── Card ── */
+        .product-card {
+            border: 1px solid var(--border);
+            margin: -1px 0 0 -1px; /* collapsed borders */
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--terracotta);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s ease;
+            z-index: 2;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 12px 40px rgba(28, 28, 28, 0.12);
+            transform: translateY(-4px);
+            z-index: 1;
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* ── Image ── */
+        .card-image-wrap {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+            background: var(--parchment-mid);
+        }
+
+        .card-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .card-image-wrap img {
+            transform: scale(1.04);
+        }
+
+        /* ── Body ── */
+        .card-body {
+            padding: 1.25rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border);
+            flex: 1;
+        }
+
+        .card-label {
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--terracotta);
+        }
+
+        .card-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+            font-weight: 400;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+        }
+
+        .card-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .card-title a:hover {
+            color: var(--terracotta);
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-price {
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color 0.2s, gap 0.2s;
+        }
+
+        .card-link::after {
+            content: '→';
+            font-style: normal;
+            transition: transform 0.2s;
+        }
+
+        .card-link:hover {
+            color: var(--terracotta);
+            gap: 0.5rem;
+        }
+
+        .card-link:hover::after {
+            transform: translateX(3px);
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 6rem 2rem;
+            color: var(--ink-muted);
+        }
+
+        .empty-state p {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .product-card, .card-image-wrap img, .card-link::after, .product-card::before {
+                transition: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Products</h1>
-    {% for product in products %}
-        <div>
-            <img src="{{ product.product_image.url }}" width="400" height="500" alt="{{product.product_title}}">
-            <h2>
-                <a href="{% url 'product_detail' product.id %}">
-                    {{ product.product_title }}
-                </a>
-            </h2>
-            <p>{{product.product_price}}</p>
+
+    <header class="site-header">
+        <h1>Products</h1>
+        <span class="header-rule"></span>
+        {% if products %}
+            <span class="product-count">{{ products|length }} item{% if products|length != 1 %}s{% endif %}</span>
+        {% endif %}
+    </header>
+
+    <main>
+        <div class="products-grid">
+            {% for product in products %}
+            <article class="product-card">
+                <div class="card-image-wrap">
+                    <img
+                        src="{{ product.product_image.url }}"
+                        alt="{{ product.product_title }}"
+                        loading="lazy"
+                    >
+                </div>
+                <div class="card-body">
+                    <span class="card-label">Product</span>
+                    <h2 class="card-title">
+                        <a href="{% url 'product_detail' product.id %}">
+                            {{ product.product_title }}
+                        </a>
+                    </h2>
+                    <div class="card-footer">
+                        <span class="card-price">{{ product.product_price }}</span>
+                        <a href="{% url 'product_detail' product.id %}" class="card-link">View</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <p>No products yet.</p>
+            </div>
+            {% endfor %}
         </div>
-        <hr>
-    {% endfor %}
+    </main>
+
 </body>
 </html>

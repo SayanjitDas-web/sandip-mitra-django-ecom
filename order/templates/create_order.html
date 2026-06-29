@@ -1,37 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>create order</title>
+    <title>Order — {{ product.product_title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --parchment:     #FAF7F2;
+            --parchment-mid: #F0EBE3;
+            --border:        #E0D8CE;
+            --ink:           #1C1C1C;
+            --ink-muted:     #6B6560;
+            --terracotta:    #C1440E;
+            --terracotta-bg: #FBF0EB;
+            --white:         #FFFFFF;
+            --error:         #B91C1C;
+        }
+
+        body {
+            background: var(--parchment);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── Nav ── */
+        .site-nav {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .site-nav a {
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .site-nav a:hover { color: var(--terracotta); }
+
+        .nav-sep { font-size: 0.78rem; color: var(--border); }
+
+        .nav-current {
+            font-size: 0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink);
+            max-width: 28ch;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Page layout ── */
+        .page-wrap {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 0;
+            min-height: calc(100vh - 57px);
+        }
+
+        /* ── Order form pane ── */
+        .form-pane {
+            padding: 4rem;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .form-header { display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .form-label-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--terracotta);
+        }
+
+        .form-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        hr.divider {
+            width: 3rem;
+            height: 2px;
+            background: var(--terracotta);
+            border: none;
+        }
+
+        /* ── Form fields ── */
+        .fields { display: flex; flex-direction: column; gap: 1.75rem; }
+
+        .field { display: flex; flex-direction: column; gap: 0.45rem; }
+
+        .field label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            border-radius: 0;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--terracotta);
+            box-shadow: 0 0 0 3px rgba(193, 68, 14, 0.1);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.6;
+        }
+
+        /* qty row */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            width: fit-content;
+            border: 1px solid var(--border);
+            background: var(--white);
+        }
+
+        .qty-btn {
+            width: 2.75rem;
+            height: 2.75rem;
+            background: var(--parchment-mid);
+            border: none;
+            color: var(--ink);
+            font-size: 1.25rem;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .qty-btn:hover { background: var(--terracotta); color: var(--white); }
+
+        .qty-input {
+            width: 4rem;
+            height: 2.75rem;
+            border: none !important;
+            border-left: 1px solid var(--border) !important;
+            border-right: 1px solid var(--border) !important;
+            box-shadow: none !important;
+            text-align: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.1rem;
+            padding: 0 !important;
+            -moz-appearance: textfield;
+        }
+
+        .qty-input::-webkit-inner-spin-button,
+        .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+        /* ── Submit ── */
+        .btn-order {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem 2.5rem;
+            background: var(--terracotta);
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            border: 2px solid var(--terracotta);
+            cursor: pointer;
+            transition: background 0.25s, color 0.25s, gap 0.25s;
+            align-self: flex-start;
+        }
+
+        .btn-order::after {
+            content: '→';
+            transition: transform 0.25s;
+        }
+
+        .btn-order:hover {
+            background: transparent;
+            color: var(--terracotta);
+            gap: 0.9rem;
+        }
+
+        .btn-order:hover::after { transform: translateX(4px); }
+
+        .btn-order:focus-visible {
+            outline: 2px solid var(--terracotta);
+            outline-offset: 3px;
+        }
+
+        /* ── Summary pane ── */
+        .summary-pane {
+            padding: 4rem 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            background: var(--white);
+        }
+
+        .summary-heading {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+        }
+
+        .summary-image-wrap {
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+            background: var(--parchment-mid);
+            border: 1px solid var(--border);
+        }
+
+        .summary-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .summary-product-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        .summary-price {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        .summary-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .summary-meta { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-row-key {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--ink-muted);
+        }
+
+        .summary-row-val {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .summary-note {
+            font-size: 0.72rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--ink-muted);
+            line-height: 1.6;
+            padding-top: 0.5rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 860px) {
+            .site-nav { padding: 1rem 1.5rem; }
+
+            .page-wrap {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-pane {
+                order: -1;
+                padding: 2rem 1.5rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .summary-image-wrap { aspect-ratio: 16 / 7; }
+
+            .form-pane {
+                padding: 2.5rem 1.5rem;
+                border-right: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn-order, .btn-order::after, .qty-btn, .field input, .field textarea {
+                transition: none;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <h1>Order {{ product.product_title }}</h1>
 
-    <form method="POST">
-        {% csrf_token %}
+    <nav class="site-nav">
+        <a href="{% url 'product_list' %}">Products</a>
+        <span class="nav-sep">/</span>
+        <a href="{% url 'product_detail' product.id %}">{{ product.product_title }}</a>
+        <span class="nav-sep">/</span>
+        <span class="nav-current">Order</span>
+    </nav>
 
-        <label>Quantity</label>
-        <input type="number" name="quantity" value="1" min="1">
+    <div class="page-wrap">
 
-        <br><br>
+        <!-- Left: form -->
+        <div class="form-pane">
+            <div class="form-header">
+                <span class="form-label-eyebrow">Checkout</span>
+                <h1 class="form-title">Place your order</h1>
+            </div>
 
-        <label>Shipping Address</label>
-        <textarea name="shipping_address" required></textarea>
+            <hr class="divider">
 
-        <br><br>
+            <form method="POST" class="fields">
+                {% csrf_token %}
 
-        <label>Phone Number</label>
-        <input type="text" name="phone_number" required>
+                <!-- Quantity -->
+                <div class="field">
+                    <label for="qty-input">Quantity</label>
+                    <div class="qty-row">
+                        <button type="button" class="qty-btn" id="qty-dec" aria-label="Decrease quantity">−</button>
+                        <input
+                            class="qty-input"
+                            type="number"
+                            id="qty-input"
+                            name="quantity"
+                            value="1"
+                            min="1"
+                            required
+                        >
+                        <button type="button" class="qty-btn" id="qty-inc" aria-label="Increase quantity">+</button>
+                    </div>
+                </div>
 
-        <br><br>
+                <!-- Shipping address -->
+                <div class="field">
+                    <label for="shipping-address">Shipping Address</label>
+                    <textarea
+                        id="shipping-address"
+                        name="shipping_address"
+                        placeholder="Street, city, state, postal code"
+                        required
+                    ></textarea>
+                </div>
 
-        <button type="submit">
-            Place Order
-        </button>
-    </form>
+                <!-- Phone -->
+                <div class="field">
+                    <label for="phone-number">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phone-number"
+                        name="phone_number"
+                        placeholder="+91 00000 00000"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-order">Place Order</button>
+            </form>
+        </div>
+
+        <!-- Right: order summary -->
+        <aside class="summary-pane">
+            <span class="summary-heading">Order Summary</span>
+
+            <div class="summary-image-wrap">
+                <img
+                    src="{{ product.product_image.url }}"
+                    alt="{{ product.product_title }}"
+                >
+            </div>
+
+            <h2 class="summary-product-title">{{ product.product_title }}</h2>
+            <span class="summary-price">{{ product.product_price }}</span>
+
+            <hr class="summary-divider">
+
+            <div class="summary-meta">
+                <div class="summary-row">
+                    <span class="summary-row-key">Delivery</span>
+                    <span class="summary-row-val">3–5 business days</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-row-key">Returns</span>
+                    <span class="summary-row-val">30-day policy</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-row-key">Payment</span>
+                    <span class="summary-row-val">Cash on delivery</span>
+                </div>
+            </div>
+
+            <p class="summary-note">
+                By placing your order you agree to our terms of service and privacy policy.
+            </p>
+        </aside>
+
+    </div>
+
+    <script>
+        const input = document.getElementById('qty-input');
+        document.getElementById('qty-dec').addEventListener('click', () => {
+            if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+        });
+        document.getElementById('qty-inc').addEventListener('click', () => {
+            input.value = parseInt(input.value) + 1;
+        });
+    </script>
+
 </body>
-
 </html>

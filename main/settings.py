@@ -64,6 +64,12 @@ AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+
+AWS_S3_CUSTOM_DOMAIN = (
+    "jezfdflsbaksobpxvouj.supabase.co/storage/v1/object/public/"
+    + AWS_STORAGE_BUCKET_NAME
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
